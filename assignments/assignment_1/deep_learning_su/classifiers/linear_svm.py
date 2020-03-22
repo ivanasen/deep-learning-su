@@ -111,7 +111,7 @@ def svm_loss_vectorized(W, X, y, reg):
     dW /= num_train
 
     # Regularize
-    dW += reg*W
+    dW += reg * W
 
     #############################################################################
     #                             END OF YOUR CODE                              #

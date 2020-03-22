@@ -68,19 +68,16 @@ class TwoLayerNet(object):
         # Unpack variables from the params dictionary
         W1, b1 = self.params['W1'], self.params['b1']
         W2, b2 = self.params['W2'], self.params['b2']
-        N, D = X.shape
-
-        num_train = X.shape[0]
+        num_train, dim_input = X.shape
 
         # Compute the forward pass
-        scores = None
         #############################################################################
         # TODO: Perform the forward pass, computing the class scores for the input. #
         # Store the result in the scores variable, which should be an array of      #
         # shape (N, C).                                                             #
         #############################################################################
-        hidden_scores = np.maximum(0, X.dot(W1) + b1)
-        scores = hidden_scores.dot(W2) + b2
+        hidden_scores = np.maximum(0, np.dot(X, W1) + b1)
+        scores = np.dot(hidden_scores, W2) + b2
         #############################################################################
         #                              END OF YOUR CODE                             #
         #############################################################################
@@ -90,7 +87,6 @@ class TwoLayerNet(object):
             return scores
 
         # Compute the loss
-        loss = None
         #############################################################################
         # TODO: Finish the forward pass, and compute the loss. This should include  #
         # both the data loss and L2 regularization for W1 and W2. Store the result  #
@@ -98,14 +94,15 @@ class TwoLayerNet(object):
         # classifier loss.                                                          #
         #############################################################################
         exp_scores = np.exp(scores)
-        probs = exp_scores / np.sum(exp_scores, axis=1)[:, np.newaxis]
-        y_probs = np.choose(y, probs.T)
+        probs = exp_scores / np.sum(exp_scores, axis=1, keepdims=True)
+        y_probs = probs[range(num_train), y]
+
         reg_loss = reg * np.sum(W1 * W1) + reg * np.sum(W2 * W2)
         loss = np.sum(-np.log(y_probs)) / num_train + reg_loss
         #############################################################################
         #                              END OF YOUR CODE                             #
         #############################################################################
-
+        
         # Backward pass: compute gradients
         grads = {}
         #############################################################################
@@ -116,7 +113,8 @@ class TwoLayerNet(object):
         dscores = probs
         dscores[range(num_train), y] -= 1
         dscores /= num_train
-        grads['W2'] = np.dot(dscores.T, hidden_scores).T + reg * W2
+
+        grads['W2'] = np.dot(hidden_scores.T, dscores) + reg * W2
         grads['b2'] = np.sum(dscores, axis=0)
 
         dhidden = np.dot(dscores, W2.T)
@@ -187,6 +185,7 @@ class TwoLayerNet(object):
             self.params['W2'] -= learning_rate * grads['W2']
             self.params['b1'] -= learning_rate * grads['b1']
             self.params['b2'] -= learning_rate * grads['b2']
+
             #########################################################################
             #                             END OF YOUR CODE                          #
             #########################################################################
@@ -229,9 +228,11 @@ class TwoLayerNet(object):
         ###########################################################################
         # TODO: Implement this function; it should be VERY simple!                #
         ###########################################################################
-        hidden_scores = np.maximum(
-            0, X.dot(self.params['W1']) + self.params['b1'])
-        scores = hidden_scores.dot(self.params['W2']) + self.params['b2']
+        W1, b1 = self.params['W1'], self.params['b1']
+        W2, b2 = self.params['W2'], self.params['b2']
+
+        hidden_scores = np.maximum(0, X.dot(W1) + b1)
+        scores = hidden_scores.dot(W2) + b2
         y_pred = np.argmax(scores, axis=1)
         ###########################################################################
         #                              END OF YOUR CODE                           #
