@@ -54,3 +54,4 @@ traitlets==4.3.2
 wcwidth==0.1.7
 webencodings==0.5.1
 widgetsnbextension==3.1.4
+imageio==2.6.0
