@@ -1,2 +1,2 @@
 # Deep Learning SU
-Repository containing assignments, projects and code from the Deep Learning couse at Sofia University.
+Repository containing assignments, projects and code from the Deep Learning course at Sofia University.
